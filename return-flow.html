@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Return Items — Ingrid Design System Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Design Tokens (Ingrid visual identity — reconstructed) ─── */
+    :root {
+      /* Colors */
+      --color-primary:        #0A0A23;
+      --color-primary-hover:  #1a1a3e;
+      --color-accent:         #4F46E5;
+      --color-accent-light:   #EEF2FF;
+      --color-success:        #059669;
+      --color-success-bg:     #ECFDF5;
+      --color-warning:        #D97706;
+      --color-warning-bg:     #FFFBEB;
+      --color-error:          #DC2626;
+      --color-error-bg:       #FEF2F2;
+
+      --color-neutral-900:    #111827;
+      --color-neutral-700:    #374151;
+      --color-neutral-500:    #6B7280;
+      --color-neutral-300:    #D1D5DB;
+      --color-neutral-200:    #E5E7EB;
+      --color-neutral-100:    #F3F4F6;
+      --color-neutral-50:     #F9FAFB;
+      --color-white:          #FFFFFF;
+
+      /* Typography */
+      --font-family:          'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --text-xs:              0.75rem;
+      --text-sm:              0.875rem;
+      --text-base:            1rem;
+      --text-lg:              1.125rem;
+      --text-xl:              1.25rem;
+      --text-2xl:             1.5rem;
+      --text-3xl:             1.875rem;
+
+      /* Spacing (4px base) */
+      --space-1:  0.25rem;
+      --space-2:  0.5rem;
+      --space-3:  0.75rem;
+      --space-4:  1rem;
+      --space-5:  1.25rem;
+      --space-6:  1.5rem;
+      --space-8:  2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+
+      /* Radii */
+      --radius-sm:  4px;
+      --radius-md:  8px;
+      --radius-lg:  12px;
+      --radius-xl:  16px;
+      --radius-full: 9999px;
+
+      /* Shadows */
+      --shadow-sm:  0 1px 2px rgba(0,0,0,.06);
+      --shadow-md:  0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:  0 8px 24px rgba(0,0,0,.1);
+    }
+
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      font-size: var(--text-base);
+      color: var(--color-neutral-900);
+      background: var(--color-neutral-100);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ─── Layout ─── */
+    .page-header {
+      background: var(--color-white);
+      border-bottom: 1px solid var(--color-neutral-200);
+      padding: var(--space-4) var(--space-8);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .page-header .logo {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: -0.5px;
+    }
+    .page-header .logo span { color: var(--color-accent); }
+    .page-header .order-ref {
+      margin-left: auto;
+      font-size: var(--text-sm);
+      color: var(--color-neutral-500);
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-4);
+    }
+
+    /* ─── Stepper ─── */
+    .stepper {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--space-8);
+    }
+    .stepper-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      flex: 1;
+      position: relative;
+    }
+    .stepper-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--color-neutral-200);
+      z-index: 0;
+    }
+    .stepper-step.completed:not(:last-child)::after { background: var(--color-accent); }
+
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-neutral-200);
+      background: var(--color-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-neutral-500);
+      position: relative;
+      z-index: 1;
+      transition: all .2s;
+    }
+    .stepper-step.active .step-circle {
+      border-color: var(--color-accent);
+      background: var(--color-accent);
+      color: var(--color-white);
+    }
+    .stepper-step.completed .step-circle {
+      border-color: var(--color-accent);
+      background: var(--color-accent);
+      color: var(--color-white);
+    }
+    .stepper-step.completed .step-circle::after { content: '✓'; }
+    .stepper-step.completed .step-circle .step-num { display: none; }
+
+    .step-label {
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--color-neutral-500);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .stepper-step.active .step-label { color: var(--color-accent); font-weight: 600; }
+    .stepper-step.completed .step-label { color: var(--color-neutral-700); }
+
+    /* ─── Card ─── */
+    .card {
+      background: var(--color-white);
+      border: 1px solid var(--color-neutral-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--color-neutral-200);
+    }
+    .card-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      color: var(--color-neutral-900);
+    }
+    .card-subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-neutral-500);
+      margin-top: var(--space-1);
+    }
+    .card-body { padding: var(--space-5) var(--space-6); }
+    .card-footer {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid var(--color-neutral-200);
+      background: var(--color-neutral-50);
+      display: flex;
+      gap: var(--space-3);
+      justify-content: flex-end;
+    }
+
+    /* ─── Item Row (select items step) ─── */
+    .item-list { display: flex; flex-direction: column; }
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--color-neutral-100);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-row:hover { background: var(--color-neutral-50); }
+    .item-row.selected { background: var(--color-accent-light); }
+
+    .item-checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--color-neutral-300);
+      background: var(--color-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .15s;
+    }
+    .item-row.selected .item-checkbox {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+    .item-row.selected .item-checkbox::after {
+      content: '';
+      width: 5px;
+      height: 9px;
+      border: 2px solid white;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translateY(-1px);
+      display: block;
+    }
+
+    .item-image {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      background: var(--color-neutral-100);
+      border: 1px solid var(--color-neutral-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .item-info { flex: 1; }
+    .item-name { font-size: var(--text-sm); font-weight: 500; color: var(--color-neutral-900); }
+    .item-meta { font-size: var(--text-xs); color: var(--color-neutral-500); margin-top: 2px; }
+    .item-price { font-size: var(--text-sm); font-weight: 600; color: var(--color-neutral-900); }
+
+    /* ─── Badge ─── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 500;
+    }
+    .badge-neutral { background: var(--color-neutral-100); color: var(--color-neutral-700); }
+    .badge-success { background: var(--color-success-bg); color: var(--color-success); }
+    .badge-warning { background: var(--color-warning-bg); color: var(--color-warning); }
+
+    /* ─── Radio Option Card ─── */
+    .option-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .option-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      border: 2px solid var(--color-neutral-200);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all .15s;
+      background: var(--color-white);
+    }
+    .option-card:hover { border-color: var(--color-neutral-300); box-shadow: var(--shadow-sm); }
+    .option-card.selected { border-color: var(--color-accent); background: var(--color-accent-light); }
+
+    .option-radio {
+      width: 18px;
+      height: 18px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-neutral-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all .15s;
+    }
+    .option-card.selected .option-radio { border-color: var(--color-accent); }
+    .option-card.selected .option-radio::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--color-accent);
+      display: block;
+    }
+
+    .option-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--color-neutral-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .option-card.selected .option-icon { background: var(--color-white); }
+    .option-body { flex: 1; }
+    .option-title { font-size: var(--text-sm); font-weight: 600; color: var(--color-neutral-900); }
+    .option-desc { font-size: var(--text-xs); color: var(--color-neutral-500); margin-top: 2px; }
+    .option-meta { font-size: var(--text-xs); color: var(--color-neutral-500); margin-top: var(--space-1); }
+    .option-tag {
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--color-success);
+      background: var(--color-success-bg);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-full);
+      display: inline-block;
+      margin-top: var(--space-1);
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-md);
+      font-family: var(--font-family);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--color-primary);
+      color: var(--color-white);
+    }
+    .btn-primary:hover { background: var(--color-primary-hover); box-shadow: var(--shadow-md); }
+    .btn-secondary {
+      background: var(--color-white);
+      color: var(--color-neutral-700);
+      border: 1px solid var(--color-neutral-200);
+    }
+    .btn-secondary:hover { background: var(--color-neutral-50); border-color: var(--color-neutral-300); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-neutral-500);
+    }
+    .btn-ghost:hover { background: var(--color-neutral-100); color: var(--color-neutral-700); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ─── Alert ─── */
+    .alert {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+    }
+    .alert-info {
+      background: var(--color-accent-light);
+      color: var(--color-accent);
+      border: 1px solid #C7D2FE;
+    }
+    .alert-success {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1px solid #A7F3D0;
+    }
+
+    /* ─── Summary list ─── */
+    .summary-list { display: flex; flex-direction: column; gap: var(--space-1); }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--text-sm);
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-neutral-100);
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-label { color: var(--color-neutral-500); }
+    .summary-value { font-weight: 500; color: var(--color-neutral-900); }
+
+    /* ─── Confirmation screen ─── */
+    .confirm-hero {
+      text-align: center;
+      padding: var(--space-10) var(--space-6) var(--space-8);
+    }
+    .confirm-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius-full);
+      background: var(--color-success-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto var(--space-5);
+    }
+    .confirm-title {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--color-neutral-900);
+      margin-bottom: var(--space-2);
+    }
+    .confirm-sub {
+      font-size: var(--text-sm);
+      color: var(--color-neutral-500);
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    .return-label-mock {
+      margin: var(--space-6);
+      padding: var(--space-5);
+      border: 2px dashed var(--color-neutral-300);
+      border-radius: var(--radius-md);
+      text-align: center;
+      background: var(--color-neutral-50);
+    }
+    .return-label-mock .barcode {
+      font-family: monospace;
+      font-size: var(--text-xs);
+      letter-spacing: 6px;
+      color: var(--color-neutral-700);
+      margin: var(--space-3) 0 var(--space-1);
+    }
+    .return-label-mock .barcode-bars {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+      margin: var(--space-3) auto;
+      width: fit-content;
+    }
+    .bar { background: var(--color-neutral-900); border-radius: 1px; }
+
+    /* ─── Step visibility ─── */
+    .step-view { display: none; }
+    .step-view.active { display: block; }
+
+    /* ─── Divider ─── */
+    .divider { height: 1px; background: var(--color-neutral-200); margin: var(--space-5) 0; }
+
+    /* ─── Quantity selector ─── */
+    .qty-selector {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-neutral-300);
+      background: var(--color-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: var(--text-base);
+      color: var(--color-neutral-700);
+      transition: all .15s;
+    }
+    .qty-btn:hover { background: var(--color-neutral-100); }
+    .qty-val { font-size: var(--text-sm); font-weight: 600; min-width: 20px; text-align: center; }
+
+    /* ─── Selection count chip ─── */
+    .selection-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-accent);
+      color: white;
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      margin-top: var(--space-4);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="page-header">
+  <div class="logo">nordic<span>store</span></div>
+  <span class="order-ref">Order #NS-204891 · Return portal</span>
+</header>
+
+<main class="container">
+
+  <!-- ─── Stepper ─── -->
+  <nav class="stepper" aria-label="Return steps">
+    <div class="stepper-step completed" id="step-nav-1">
+      <div class="step-circle"><span class="step-num">1</span></div>
+      <span class="step-label">Items</span>
+    </div>
+    <div class="stepper-step active" id="step-nav-2">
+      <div class="step-circle"><span class="step-num">2</span></div>
+      <span class="step-label">Reason</span>
+    </div>
+    <div class="stepper-step" id="step-nav-3">
+      <div class="step-circle"><span class="step-num">3</span></div>
+      <span class="step-label">Method</span>
+    </div>
+    <div class="stepper-step" id="step-nav-4">
+      <div class="step-circle"><span class="step-num">4</span></div>
+      <span class="step-label">Done</span>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════
+       STEP 1 — Select Items
+  ════════════════════════════════════════════ -->
+  <div class="step-view" id="step-1">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Select items to return</div>
+        <div class="card-subtitle">Choose one or more items from order #NS-204891</div>
+      </div>
+
+      <div class="item-list">
+
+        <div class="item-row selected" onclick="toggleItem(this)">
+          <div class="item-checkbox"></div>
+          <div class="item-image">👟</div>
+          <div class="item-info">
+            <div class="item-name">Running Shoes — Storm Grey</div>
+            <div class="item-meta">Size: EU 42 &nbsp;·&nbsp; Qty: 1 &nbsp;·&nbsp; <span class="badge badge-success">Returnable</span></div>
+          </div>
+          <div class="item-price">€89.00</div>
+        </div>
+
+        <div class="item-row" onclick="toggleItem(this)">
+          <div class="item-checkbox"></div>
+          <div class="item-image">🧥</div>
+          <div class="item-info">
+            <div class="item-name">Merino Wool Jacket — Navy</div>
+            <div class="item-meta">Size: M &nbsp;·&nbsp; Qty: 1 &nbsp;·&nbsp; <span class="badge badge-success">Returnable</span></div>
+          </div>
+          <div class="item-price">€149.00</div>
+        </div>
+
+        <div class="item-row" style="opacity:.55;cursor:not-allowed" title="Final sale — not eligible for return">
+          <div class="item-checkbox"></div>
+          <div class="item-image">🧣</div>
+          <div class="item-info">
+            <div class="item-name">Cashmere Scarf — Cream</div>
+            <div class="item-meta">Qty: 1 &nbsp;·&nbsp; <span class="badge badge-warning">Final sale</span></div>
+          </div>
+          <div class="item-price">€45.00</div>
+        </div>
+
+      </div>
+
+      <div class="card-footer" style="flex-direction:column;align-items:flex-start;gap:var(--space-3)">
+        <div id="selection-count" class="selection-chip">1 item selected — €89.00</div>
+        <div style="display:flex;gap:var(--space-3);align-self:flex-end">
+          <button class="btn btn-ghost">Cancel</button>
+          <button class="btn btn-primary" onclick="goTo(2)">Continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       STEP 2 — Return Reason
+  ════════════════════════════════════════════ -->
+  <div class="step-view active" id="step-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Why are you returning this?</div>
+        <div class="card-subtitle">Running Shoes — Storm Grey, EU 42</div>
+      </div>
+
+      <div class="card-body">
+        <div class="option-list">
+
+          <div class="option-card selected" onclick="selectOption(this, 'reason')">
+            <div class="option-radio"></div>
+            <div class="option-body">
+              <div class="option-title">Wrong size</div>
+              <div class="option-desc">The item doesn't fit as expected</div>
+            </div>
+          </div>
+
+          <div class="option-card" onclick="selectOption(this, 'reason')">
+            <div class="option-radio"></div>
+            <div class="option-body">
+              <div class="option-title">Changed my mind</div>
+              <div class="option-desc">I no longer want or need this item</div>
+            </div>
+          </div>
+
+          <div class="option-card" onclick="selectOption(this, 'reason')">
+            <div class="option-radio"></div>
+            <div class="option-body">
+              <div class="option-title">Damaged or defective</div>
+              <div class="option-desc">Item arrived damaged or isn't working correctly</div>
+            </div>
+          </div>
+
+          <div class="option-card" onclick="selectOption(this, 'reason')">
+            <div class="option-radio"></div>
+            <div class="option-body">
+              <div class="option-title">Not as described</div>
+              <div class="option-desc">Product looks or feels different from the listing</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <label style="display:block;font-size:var(--text-sm);font-weight:500;color:var(--color-neutral-700);margin-bottom:var(--space-2)">
+          Additional comments <span style="color:var(--color-neutral-400);font-weight:400">(optional)</span>
+        </label>
+        <textarea
+          placeholder="Tell us more about the issue…"
+          style="width:100%;padding:var(--space-3) var(--space-4);border:1px solid var(--color-neutral-300);border-radius:var(--radius-md);font-family:var(--font-family);font-size:var(--text-sm);color:var(--color-neutral-900);resize:vertical;min-height:80px;outline:none;transition:border .15s"
+          onfocus="this.style.borderColor='var(--color-accent)'"
+          onblur="this.style.borderColor='var(--color-neutral-300)'"
+        ></textarea>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn btn-secondary" onclick="goTo(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goTo(3)">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       STEP 3 — Return Method
+  ════════════════════════════════════════════ -->
+  <div class="step-view" id="step-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Choose return method</div>
+        <div class="card-subtitle">Select how you'd like to send the item back</div>
+      </div>
+
+      <div class="card-body">
+        <div class="option-list">
+
+          <div class="option-card selected" onclick="selectOption(this, 'method')">
+            <div class="option-radio"></div>
+            <div class="option-icon">📦</div>
+            <div class="option-body">
+              <div class="option-title">Drop-off at parcel shop</div>
+              <div class="option-desc">Bring your return to the nearest PostNord, DHL, or UPS location</div>
+              <div class="option-meta">Over 4,200 drop-off points available near you</div>
+              <div class="option-tag">Free return</div>
+            </div>
+          </div>
+
+          <div class="option-card" onclick="selectOption(this, 'method')">
+            <div class="option-radio"></div>
+            <div class="option-icon">🚚</div>
+            <div class="option-body">
+              <div class="option-title">Home pickup</div>
+              <div class="option-desc">Schedule a courier pickup from your address</div>
+              <div class="option-meta">Available Mon–Fri, select your preferred time slot</div>
+              <div class="option-tag">Free return</div>
+            </div>
+          </div>
+
+          <div class="option-card" onclick="selectOption(this, 'method')">
+            <div class="option-radio"></div>
+            <div class="option-icon">🏪</div>
+            <div class="option-body">
+              <div class="option-title">Return in store</div>
+              <div class="option-desc">Bring the item to any NordicStore location</div>
+              <div class="option-meta">Show your return QR code at the register</div>
+              <div class="option-tag">Instant refund</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="alert alert-info">
+          <span>ℹ️</span>
+          <span>Your refund of <strong>€89.00</strong> will be processed within 3–5 business days after we receive the item.</span>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn btn-secondary" onclick="goTo(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goTo(4)">Confirm return →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       STEP 4 — Confirmation
+  ════════════════════════════════════════════ -->
+  <div class="step-view" id="step-4">
+    <div class="card">
+
+      <div class="confirm-hero">
+        <div class="confirm-icon">✅</div>
+        <div class="confirm-title">Return booked!</div>
+        <div class="confirm-sub">Your return has been registered. Print or save your label below and drop it off at the nearest parcel shop.</div>
+      </div>
+
+      <!-- Simulated return label -->
+      <div class="return-label-mock">
+        <div style="font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-neutral-500);margin-bottom:var(--space-3)">Return Shipping Label</div>
+        <div style="font-weight:700;font-size:var(--text-lg)">NordicStore Returns</div>
+        <div style="font-size:var(--text-xs);color:var(--color-neutral-500);margin-top:2px">Warehouse 3 · Industrivägen 14 · 211 24 Malmö, SE</div>
+
+        <div class="barcode-bars" style="display:flex;justify-content:center;gap:2px;margin:var(--space-4) auto">
+          <script>
+            // draw fake barcode bars inline
+            document.write([3,1,2,1,3,2,1,1,2,3,1,2,1,3,1,2,1,3,2,1,1,2,1,3,2,1,1,3,1,2,3,1,2,1,3,1,2,1,3,2]
+              .map(w=>`<div class="bar" style="width:${w}px;height:40px"></div>`).join(''));
+          </script>
+        </div>
+        <div class="barcode">RET-204891-01</div>
+        <div style="font-size:var(--text-xs);color:var(--color-neutral-400);margin-top:var(--space-2)">Valid until 26 April 2026 · PostNord / DHL / UPS accepted</div>
+      </div>
+
+      <div class="card-body">
+        <div style="font-size:var(--text-sm);font-weight:600;color:var(--color-neutral-700);margin-bottom:var(--space-3)">Return summary</div>
+        <div class="summary-list">
+          <div class="summary-row">
+            <span class="summary-label">Item</span>
+            <span class="summary-value">Running Shoes — Storm Grey, EU 42</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Reason</span>
+            <span class="summary-value">Wrong size</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Return method</span>
+            <span class="summary-value">Drop-off at parcel shop</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Refund amount</span>
+            <span class="summary-value" style="color:var(--color-success);font-weight:700">€89.00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Refund to</span>
+            <span class="summary-value">Original payment method</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Return ID</span>
+            <span class="summary-value" style="font-family:monospace">RET-204891-01</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="alert alert-success">
+          <span>📧</span>
+          <span>Confirmation sent to <strong>anna.lindqvist@email.com</strong>. You'll get a refund notification once we process your return.</span>
+        </div>
+      </div>
+
+      <div class="card-footer" style="justify-content:space-between">
+        <button class="btn btn-ghost" onclick="goTo(1)">← Start new return</button>
+        <button class="btn btn-primary" onclick="window.print()">🖨 Print label</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ─── Navigation ───
+  function goTo(step) {
+    document.querySelectorAll('.step-view').forEach(v => v.classList.remove('active'));
+    document.getElementById('step-' + step).classList.add('active');
+    updateStepper(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateStepper(current) {
+    for (let i = 1; i <= 4; i++) {
+      const nav = document.getElementById('step-nav-' + i);
+      nav.classList.remove('active', 'completed');
+      if (i < current) nav.classList.add('completed');
+      else if (i === current) nav.classList.add('active');
+    }
+  }
+
+  // ─── Toggle item selection ───
+  function toggleItem(row) {
+    if (row.style.cursor === 'not-allowed') return;
+    row.classList.toggle('selected');
+    updateSelectionChip();
+  }
+
+  function updateSelectionChip() {
+    const prices = { 0: 89, 1: 149 };
+    const rows = document.querySelectorAll('#step-1 .item-row:not([style*="not-allowed"])');
+    let count = 0, total = 0;
+    rows.forEach((r, i) => {
+      if (r.classList.contains('selected')) { count++; total += prices[i] || 0; }
+    });
+    const chip = document.getElementById('selection-count');
+    chip.textContent = count === 0
+      ? 'No items selected'
+      : `${count} item${count > 1 ? 's' : ''} selected — €${total.toFixed(2)}`;
+    chip.style.background = count === 0 ? 'var(--color-neutral-400)' : 'var(--color-accent)';
+  }
+
+  // ─── Radio option select ───
+  function selectOption(card, group) {
+    card.closest('.option-list')
+        .querySelectorAll('.option-card')
+        .forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  }
+</script>
+
+</body>
+</html>
